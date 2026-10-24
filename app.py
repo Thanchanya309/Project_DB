@@ -1,4 +1,5 @@
 from html import escape
+from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -58,7 +59,7 @@ with overview:
     with b:
         trend(data,'unemp_rate',filters,'unemployment')
         trend(data,'emp_headcount',filters,'headcount')
-    with st.container(border=True):
+    with st.container(border=True, key='heatcard'):
         st.markdown('#### ไตรมาสใดมีอัตราการว่างงานสูงที่สุด?')
         heat = slice_metric(data,'unemp_rate',filters)
         if not heat.empty and not heat.duplicated(['year','quarter']).any():
@@ -97,9 +98,11 @@ with demographics:
 with st.expander('ตรวจสอบข้อมูล · ข้อจำกัด · ดาวน์โหลด'):
     st.write(f'ข้อมูลต้นฉบับ {len(raw):,} แถว · ค่าที่ใช้ได้ {len(clean):,} คีย์ตัวชี้วัด · ค่าขัดแย้งที่ตัดออก {len(conflicts):,} คีย์')
     st.caption('ไม่มี GeoJSON ที่ตรวจสอบแล้ว จึงใช้กราฟแท่งแทนแผนที่ • แถวที่ไม่ระบุพื้นที่ไม่ถูกตีความว่าเป็นพื้นที่รวม • จำนวนผู้มีงานทำไม่รวมข้ามกลุ่มและยังไม่ยืนยันหน่วย')
-    st.markdown(open('docs/DATA_AUDIT.md',encoding='utf-8-sig').read())
+    st.markdown(Path('docs/DATA_AUDIT.md').read_text(encoding='utf-8-sig'))
     selected = pd.concat([slice_metric(data,m,filters) for m in LABELS],ignore_index=True)
-    st.dataframe(selected, use_container_width=True, hide_index=True)
+    st.dataframe(selected, width='stretch', hide_index=True)
     st.download_button('ดาวน์โหลดข้อมูลตามตัวกรอง',selected.to_csv(index=False).encode('utf-8-sig'),'filtered_labor_data.csv','text/csv')
     st.download_button('ดาวน์โหลดคีย์ที่ขัดแย้ง',conflicts.to_csv(index=False).encode('utf-8-sig'),'conflicting_keys.csv','text/csv')
 st.caption('แหล่งข้อมูล: final_labor_master_data(1).csv · ไม่ประมาณค่า ไม่รวมอัตรา ไม่สร้างยอดรวมแทนข้อมูลที่ขาด')
+
+

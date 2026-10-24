@@ -41,7 +41,7 @@ def sidebar(data):
     schemes = data.scheme.unique().tolist()
     scheme = st.sidebar.selectbox('ชุดนิยามภูมิภาค', schemes, on_change=reset)
     pool = data[data.scheme.eq(scheme)]
-    st.sidebar.button('↺ ล้างตัวกรองทั้งหมด', on_click=reset, use_container_width=True)
+    st.sidebar.button('↺ ล้างตัวกรองทั้งหมด', on_click=reset, width='stretch')
     names = ['ปี พ.ศ.','ไตรมาส (0 = รายปี)','ภูมิภาค','พื้นที่','เพศ','กลุ่มอายุ']
     for dim, label in zip(DIMS, names):
         st.session_state.setdefault('f_' + dim, [])
@@ -53,3 +53,4 @@ def sidebar(data):
 
 def bump():
     st.session_state.revision += 1
+

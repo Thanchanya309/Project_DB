@@ -20,6 +20,12 @@ def load_data(path=None):
     missing = set(DIMS + METRICS) - set(df.columns)
     if missing:
         raise ValueError(f'ขาดคอลัมน์: {sorted(missing)}')
+    for col in ['year', 'quarter'] + METRICS:
+        df[col] = pd.to_numeric(df[col], errors='raise')
+    if df[['year', 'quarter']].isna().any().any() or not df.quarter.isin([0, 1, 2, 3, 4]).all():
+        raise ValueError('ปีหรือไตรมาสไม่ถูกต้อง')
+    if ((df[METRICS] < 0) | (df[METRICS] == float('inf'))).any().any():
+        raise ValueError('พบค่าตัวชี้วัดนอกช่วงที่รองรับ')
     return df
 
 
@@ -38,4 +44,5 @@ def prepare(raw):
     conflicts = grouped[grouped['nunique'] > 1].copy()
     clean = grouped[grouped['nunique'] == 1].rename(columns={'first':'value'}).drop(columns=['nunique','size'])
     return clean, conflicts
+
 

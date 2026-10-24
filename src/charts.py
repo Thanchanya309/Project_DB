@@ -6,11 +6,11 @@ COLORS = ['#E83C91','#843A7D','#57C7FF','#F7A531','#b295c8','#43334C']
 
 
 def draw(fig, key, dims=()):
-    fig.update_layout(font={'family':'Kanit, sans-serif','color':'#43334C'}, paper_bgcolor='white', plot_bgcolor='white', margin=dict(l=10,r=15,t=20,b=20), height=320, legend_title_text='', clickmode='event+select')
+    fig.update_layout(font={'family':'Kanit, sans-serif','color':'#43334C'}, paper_bgcolor='white', plot_bgcolor='white', margin=dict(l=10,r=15,t=20,b=20), height=320, legend_title_text='', legend=dict(orientation='h', y=-0.28, font_size=10), clickmode='event+select')
     fig.update_xaxes(showgrid=False)
     fig.update_yaxes(gridcolor='#f2edf2', zeroline=False)
     chart_key = f'{key}_{st.session_state.revision}'
-    st.plotly_chart(fig, key=chart_key, use_container_width=True, on_select=(lambda: chart_callback(chart_key, dims)) if dims else 'ignore', selection_mode=('points','box','lasso'), config={'displaylogo':False})
+    st.plotly_chart(fig, key=chart_key, width='stretch', on_select=(lambda: chart_callback(chart_key, dims)) if dims else 'ignore', selection_mode=('points','box','lasso'), config={'displaylogo':False})
 
 
 def chart_data(data, metric, filters, vary=()):
@@ -22,7 +22,7 @@ def chart_data(data, metric, filters, vary=()):
 
 
 def trend(data, metric, filters, key):
-    with st.container(border=True):
+    with st.container(border=True, key=f'card_{key}'):
         st.markdown('#### '+ LABELS[metric] + 'ตามเวลา')
         frame = slice_metric(data, metric, filters)
         if frame.empty:
@@ -44,7 +44,7 @@ def trend(data, metric, filters, key):
 
 
 def comparison(data, metric, filters, dimension, title, key):
-    with st.container(border=True):
+    with st.container(border=True, key=f'card_{key}'):
         st.markdown('#### '+title)
         frame = chart_data(data, metric, filters, [dimension])
         if frame.empty:
@@ -57,7 +57,7 @@ def comparison(data, metric, filters, dimension, title, key):
 
 
 def scatter(data, metric, filters, key, title):
-    with st.container(border=True):
+    with st.container(border=True, key=f'card_{key}'):
         st.markdown('#### '+title)
         left = chart_data(data, metric, filters, ['region'])
         right = chart_data(data, 'avg_wage', filters, ['region'])
@@ -69,3 +69,5 @@ def scatter(data, metric, filters, key, title):
         fig = px.scatter(frame,x='value_x',y='value_y',color='region',custom_data=['region'],hover_name='region',color_discrete_sequence=COLORS, labels={'value_x':LABELS[metric],'value_y':'ค่าจ้างเฉลี่ย (หน่วยต้นฉบับ)'})
         fig.update_traces(marker_size=16,marker_line_width=2,marker_line_color='white')
         draw(fig,key,['region'])
+
+
